@@ -154,7 +154,9 @@ export default {
     loadCategories() {
       return axios
         .get(`${API_BASE_URL}api/productCategories`)
-        .then((response) => { this.categoriesData = response.data; });
+        .then((response) => {
+          this.categoriesData = response.data;
+        });
     },
 
     loadSeasons() {
@@ -176,6 +178,10 @@ export default {
     },
 
     filter() {
+      if (this.$route.params.category !== this.currCategoryId) {
+        this.$router.push({ name: 'main' });
+      }
+
       this.$emit('update:priceFrom', this.currPriceFrom);
       this.$emit('update:priceTo', this.currPriceTo);
       this.$emit('update:categoryId', this.currCategoryId);
@@ -185,6 +191,10 @@ export default {
     },
 
     reset() {
+      if (this.$route.params.category !== 0) {
+        this.$router.push({ name: 'main' });
+      }
+
       this.$emit('update:priceFrom', 0);
       this.$emit('update:priceTo', 0);
       this.$emit('update:categoryId', 0);
@@ -220,6 +230,10 @@ export default {
     this.loadSeasons();
     this.loadMaterials();
     this.loadColors();
+
+    if (this.categoryId) {
+      this.currCategoryId = this.categoryId;
+    }
   },
 };
 </script>

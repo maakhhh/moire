@@ -40,19 +40,13 @@
           <div class="cart__options">
             <h3 class="cart__title">Доставка</h3>
             <ul class="cart__options options">
-              <li class="options__item">
+              <li class="options__item" v-for="delivery in deliveries" :key="`delivery-type${delivery.id}`">
                 <label class="options__label">
-                  <input class="options__radio sr-only" type="radio" name="delivery" value="1" v-model.number="form.deliveryTypeId">
+                  <input class="options__radio sr-only" type="radio" name="delivery" :value="delivery.id" v-model.number="form.deliveryTypeId">
                   <span class="options__value">
-                    Самовывоз <b>бесплатно</b>
-                  </span>
-                </label>
-              </li>
-              <li class="options__item">
-                <label class="options__label">
-                  <input class="options__radio sr-only" type="radio" name="delivery" value="2" v-model.number="form.deliveryTypeId">
-                  <span class="options__value">
-                    Курьером <b>1 200 ₽</b>
+                    {{ delivery.title }}
+                    <b v-if="delivery.price == 0">бесплатно</b>
+                    <b v-else>{{ delivery.price | numberFormat }} ₽</b>
                   </span>
                 </label>
               </li>
@@ -60,19 +54,11 @@
 
             <h3 class="cart__title">Оплата</h3>
             <ul class="cart__options options">
-              <li class="options__item">
+              <li class="options__item" v-for="payment in payments" :key="`payments${payment.id}`">
                 <label class="options__label">
-                  <input class="options__radio sr-only" type="radio" name="pay" :value="1" v-model.number="form.paymentTypeId">
+                  <input class="options__radio sr-only" type="radio" name="pay" :value="payment.id" v-model.number="form.paymentTypeId">
                   <span class="options__value">
-                    Картой при получении
-                  </span>
-                </label>
-              </li>
-              <li class="options__item">
-                <label class="options__label">
-                  <input class="options__radio sr-only" type="radio" name="pay" :value="2" v-model="form.paymentTypeId">
-                  <span class="options__value">
-                    Наличными при получении
+                    {{ payment.title }}
                   </span>
                 </label>
               </li>
@@ -83,7 +69,7 @@
         <div class="cart__block">
           <OrderList :products="products"/>
           <div class="cart__total">
-            <p>Доставка: <b v-if="form.deliveryTypeId === 1">бесплатно</b><b v-else>1 200 ₽</b></p>
+            <p>Доставка: <b v-if="deliveryPrice == 0">бесплатно</b><b v-else>{{ deliveryPrice | numberFormat }} ₽</b></p>
             <p>Итого: <b>{{ count | counterProductFormat }}</b> на сумму <b>{{ price | numberFormat }} ₽</b></p>
           </div>
           <div v-if="loading" class="loading"><BaseLoader /></div>
@@ -123,6 +109,9 @@ export default {
       errors: {},
       errorMessage: '',
       loading: false,
+
+      deliveryData: null,
+      paymentsData: null,
     };
   },
 
@@ -140,18 +129,37 @@ export default {
       }));
     },
 
+    deliveryPrice() {
+      return this.deliveryData
+        ? this.deliveries.find((delivery) => delivery.id === this.form.deliveryTypeId).price
+        : [];
+    },
+
     price() {
       const price = this.products.reduce((pr, product) => (
         pr + product.price
       ), 0);
-      if (this.form.deliveryTypeId === 2) {
-        return price + 1200;
-      }
-      return price;
+      return price + +this.deliveryPrice;
     },
 
     count() {
       return this.products.length;
+    },
+
+    deliveries() {
+      return this.deliveryData ? this.deliveryData : [];
+    },
+
+    payments() {
+      return this.paymentsData ? this.paymentsData : [];
+    },
+  },
+
+  watch: {
+    'form.deliveryTypeId': {
+      handler() {
+        this.loadPayments();
+      },
     },
   },
 
@@ -179,6 +187,26 @@ export default {
         })
         .finally(() => { this.loading = false; });
     },
+
+    loadDelivery() {
+      return axios
+        .get(`${API_BASE_URL}api/deliveries`)
+        .then((response) => { this.deliveryData = response.data; });
+    },
+
+    loadPayments() {
+      return axios
+        .get(`${API_BASE_URL}api/payments?deliveryTypeId=${this.form.deliveryTypeId}`)
+        .then((response) => {
+          this.paymentsData = response.data;
+          this.form.paymentTypeId = response.data[0].id;
+        });
+    },
+  },
+
+  created() {
+    this.loadDelivery();
+    this.loadPayments();
   },
 };
 </script>

@@ -126,9 +126,31 @@ export default {
     seasonsIds() {
       this.loadProducts();
     },
+    colorIds() {
+      this.loadProducts();
+    },
+    '$route.params.category': {
+      handler(id) {
+        if (id) {
+          if (Number.isInteger(+id)) {
+            this.categoryId = id;
+          } else {
+            this.$router.push({ name: 'not-found' });
+          }
+        }
+      },
+    },
   },
 
   created() {
+    if (this.$route.params.category) {
+      if (Number.isInteger(this.$route.params.category)) {
+        this.categoryId = this.$route.params.category;
+      } else {
+        this.$router.push({ name: 'not-found' });
+      }
+    }
+
     this.loadProducts();
   },
 };

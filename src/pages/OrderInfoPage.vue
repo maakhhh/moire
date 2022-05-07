@@ -1,7 +1,7 @@
 <template>
 <!-- eslint-disable max-len -->
   <div class="container loader" v-if="$store.state.orderInfoLoading"><BaseLoader/></div>
-  <div style="text-align: center;" v-else-if="$store.state.orderError">{{ $store.state.orderError }}</div>
+  <div style="text-align: center; margin: 200px 0; font-size: 30px;" v-else-if="$store.state.orderError">{{ $store.state.orderError }}</div>
   <main class="content container" v-else>
     <div class="content__top">
       <ul class="breadcrumbs">

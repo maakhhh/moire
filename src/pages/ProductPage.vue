@@ -11,7 +11,7 @@
           </router-link>
         </li>
         <li class="breadcrumbs__item">
-          <router-link :to="{name: 'main'}" class="breadcrumbs__link">
+          <router-link :to="{name: 'main-category', params: { category: product.category.id }}" class="breadcrumbs__link">
             {{ product.category.title }}
           </router-link>
         </li>
@@ -53,7 +53,7 @@
                   </svg>
                 </button>
 
-                <input type="text" v-model="count" name="count" disabled>
+                <input type="number" v-model="count" name="count">
 
                 <button type="button" aria-label="Добавить один товар" @click.prevent="count++">
                   <svg width="12" height="12" fill="currentColor">
@@ -137,6 +137,7 @@ export default {
       productLoading: false,
       productAddedLoading: false,
       productAddedText: false,
+      errorText: '',
 
       currColor: 0,
       count: 1,
@@ -192,6 +193,14 @@ export default {
           this.currColor = response.data.colors[0].color.id;
           this.sizeId = response.data.sizes[0].id;
         })
+        .catch((error) => {
+          const productError = error.response.data.error;
+
+          if (productError.code === 404) {
+            this.$router.push({ name: 'not-found' });
+          }
+          this.errorText = productError.message;
+        })
         .finally(() => { this.productLoading = false; });
     },
 
@@ -214,7 +223,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
   .not-photo {
     width: 570px;
     height: 570px;
@@ -228,5 +237,15 @@ export default {
     margin: 0 50px;
     width: 20px;
     height: 20px;
+  }
+
+  input[type="number"] {
+  -webkit-appearance: textfield;
+     -moz-appearance: textfield;
+          appearance: textfield;
+  }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
   }
 </style>
