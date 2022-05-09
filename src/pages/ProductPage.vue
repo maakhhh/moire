@@ -147,7 +147,12 @@ export default {
     };
   },
 
-  components: { NotPhoto, BaseLoader },
+  components: {
+    NotPhoto,
+    BaseLoader,
+    ProductInfo,
+    ProductDelivery,
+  },
 
   filters: { numberFormat },
 
@@ -164,9 +169,9 @@ export default {
 
     currInfoPage() {
       if (this.infoId === 0) {
-        return ProductInfo;
+        return 'ProductInfo';
       }
-      return ProductDelivery;
+      return 'ProductDelivery';
     },
   },
 

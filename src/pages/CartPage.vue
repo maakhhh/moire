@@ -9,9 +9,9 @@
           </router-link>
         </li>
         <li class="breadcrumbs__item">
-          <router-link :to="{name: 'cart'}" class="breadcrumbs__link">
+          <div class="breadcrumbs__link">
             Корзина
-          </router-link>
+          </div>
         </li>
       </ul>
 

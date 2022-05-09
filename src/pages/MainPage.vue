@@ -14,7 +14,7 @@
     </div>
 
     <div class="content__catalog">
-      <ProductFilter :priceFrom.sync="priceFrom" :priceTo.sync="priceTo" :categoryId.sync="categoryId" :materialsIds.sync="materialsIds" :seasonsIds.sync="seasonsIds" :colorIds.sync="colorIds" />
+      <ProductFilter v-if="categories" :categories="categories" :priceFrom.sync="priceFrom" :priceTo.sync="priceTo" :categoryId.sync="categoryId" :materialsIds.sync="materialsIds" :seasonsIds.sync="seasonsIds" :colorIds.sync="colorIds" />
       <section class="catalog">
         <BaseLoader v-if="productsLoader"/>
         <ProductList :products="products"/>
@@ -38,6 +38,7 @@ export default {
   data() {
     return {
       productsData: [],
+      categoriesData: null,
 
       perPage: 12,
       page: 1,
@@ -76,6 +77,10 @@ export default {
     countProducts() {
       return this.productsData.pagination ? this.productsData.pagination.total : 0;
     },
+
+    categories() {
+      return this.categoriesData ? this.categoriesData.items : [];
+    },
   },
 
   methods: {
@@ -100,6 +105,12 @@ export default {
           .finally(() => { this.productsLoader = false; });
       }, 0);
     },
+
+    loadCategories() {
+      return axios
+        .get(`${API_BASE_URL}api/productCategories`)
+        .then((response) => { this.categoriesData = response.data; });
+    },
   },
 
   watch: {
@@ -122,7 +133,6 @@ export default {
     materialsIds() {
       this.loadProducts();
     },
-
     seasonsIds() {
       this.loadProducts();
     },
@@ -130,28 +140,43 @@ export default {
       this.loadProducts();
     },
     '$route.params.category': {
-      handler(id) {
-        if (id) {
-          if (Number.isInteger(+id)) {
-            this.categoryId = id;
+      handler(categoryId) {
+        if (categoryId) {
+          let id = +categoryId; // eslint-disable-line prefer-const
+          if (!this.categoriesData) {
+            this.loadCategories()
+              .then(() => {
+                const category = this.categoriesData.items.find((c) => c.id === id);
+
+                if (category !== undefined) {
+                  this.categoryId = id;
+                } else {
+                  this.$router.push({ name: 'not-found' });
+                }
+
+                this.loadProducts();
+              });
           } else {
-            this.$router.push({ name: 'not-found' });
+            const category = this.categoriesData.items.find((c) => c.id === id);
+
+            if (category) {
+              this.categoryId = id;
+            } else {
+              this.$router.push({ name: 'not-found' });
+            }
           }
         }
       },
+
+      immediate: true,
     },
   },
 
   created() {
-    if (this.$route.params.category) {
-      if (Number.isInteger(this.$route.params.category)) {
-        this.categoryId = this.$route.params.category;
-      } else {
-        this.$router.push({ name: 'not-found' });
-      }
+    if (!this.$route.params.category) {
+      this.loadCategories();
+      this.loadProducts();
     }
-
-    this.loadProducts();
   },
 };
 </script>

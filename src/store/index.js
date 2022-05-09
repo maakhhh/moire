@@ -11,6 +11,7 @@ export default new Vuex.Store({
     cartProductsData: [],
     cartLoading: false,
     orderInfoLoading: false,
+    deliveries: null,
 
     userAccessKey: null,
     orderInfo: null,
@@ -136,9 +137,20 @@ export default new Vuex.Store({
         })
         .finally(() => { context.commit('updateOrderInfoLoading', false); });
     },
+
+    loadDeliveries(context) {
+      return axios
+        .get(`${API_BASE_URL}api/deliveries`)
+        .then((response) => {
+          context.commit('updateDeliveries', response.data);
+        });
+    },
   },
 
   mutations: {
+    updateDeliveries(state, value) {
+      state.deliveries = value;
+    },
     updateOrderInfoLoading(state, value) {
       state.orderInfoLoading = value;
     },

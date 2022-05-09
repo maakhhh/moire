@@ -125,7 +125,7 @@ export default {
   components: { CartIndicator },
 
   methods: {
-    ...mapActions(['loadCart']),
+    ...mapActions(['loadCart', 'loadDeliveries']),
     ...mapMutations(['updateUserAccessKey']),
   },
 
@@ -136,6 +136,7 @@ export default {
       this.updateUserAccessKey(accessKey);
     }
     this.loadCart();
+    this.loadDeliveries();
   },
 };
 </script>

@@ -147,7 +147,7 @@ export default {
     },
 
     deliveries() {
-      return this.deliveryData ? this.deliveryData : [];
+      return this.$store.state.deliveries ? this.$store.state.deliveries : [];
     },
 
     payments() {
@@ -188,12 +188,6 @@ export default {
         .finally(() => { this.loading = false; });
     },
 
-    loadDelivery() {
-      return axios
-        .get(`${API_BASE_URL}api/deliveries`)
-        .then((response) => { this.deliveryData = response.data; });
-    },
-
     loadPayments() {
       return axios
         .get(`${API_BASE_URL}api/payments?deliveryTypeId=${this.form.deliveryTypeId}`)
@@ -205,7 +199,6 @@ export default {
   },
 
   created() {
-    this.loadDelivery();
     this.loadPayments();
   },
 };

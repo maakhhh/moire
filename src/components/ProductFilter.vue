@@ -88,7 +88,7 @@ import API_BASE_URL from '@/config';
 import BaseLoader from '@/components/BaseLoader.vue';
 
 export default {
-  props: ['priceFrom', 'priceTo', 'categoryId', 'materialsIds', 'seasonsIds', 'colorIds'],
+  props: ['priceFrom', 'priceTo', 'categoryId', 'materialsIds', 'seasonsIds', 'colorIds', 'categories'],
 
   data() {
     return {
@@ -111,10 +111,6 @@ export default {
   },
 
   computed: {
-    categories() {
-      return this.categoriesData ? this.categoriesData.items : [];
-    },
-
     seasons() {
       return this.seasonsData ? this.seasonsData.items : [];
     },
@@ -151,14 +147,6 @@ export default {
   },
 
   methods: {
-    loadCategories() {
-      return axios
-        .get(`${API_BASE_URL}api/productCategories`)
-        .then((response) => {
-          this.categoriesData = response.data;
-        });
-    },
-
     loadSeasons() {
       return axios
         .get(`${API_BASE_URL}api/seasons`)
@@ -226,7 +214,6 @@ export default {
   },
 
   created() {
-    this.loadCategories();
     this.loadSeasons();
     this.loadMaterials();
     this.loadColors();

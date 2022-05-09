@@ -22,32 +22,11 @@
 </template>
 
 <script>
-import axios from 'axios';
-import API_BASE_URL from '@/config';
-
 export default {
-  data() {
-    return {
-      deliveryData: [],
-    };
-  },
-
   computed: {
     delivery() {
-      return this.deliveryData ? this.deliveryData : [];
+      return this.$store.state.deliveries ? this.$store.state.deliveries : [];
     },
-  },
-
-  methods: {
-    loadDelivery() {
-      return axios
-        .get(`${API_BASE_URL}api/deliveries`)
-        .then((response) => { this.deliveryData = response.data; });
-    },
-  },
-
-  created() {
-    this.loadDelivery();
   },
 };
 </script>
